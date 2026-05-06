@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecoryx — Business Development Tracker</title>
+<link rel="icon" type="image/png" href="https://ecoryx.com/wp-content/uploads/2026/01/cropped-512x512-Fav-icon-03-270x270.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Ecoryx-aligned palette: sustainability green primary, warm cream paper, earth accent */
+  --ink: #1a2622;
+  --paper: #faf6ee;
+  --paper-2: #f0e9d8;
+  --rule: #d6cfb9;
+  --primary: #2d6a4f;          /* Forest green - primary brand */
+  --primary-soft: #d8e8df;
+  --primary-deep: #1f4d3a;
+  --accent: #c8884a;            /* Warm earth/sand for highlights */
+  --accent-soft: #f0e0c8;
+  --green-tag: #4a7c3a;
+  --green-tag-soft: #d6e4cd;
+  --muted: #7a7560;
+  --high: #b04a3c;
+  --med: #c8884a;
+  --low: #3d6a85;
+  --tracking: #4a5d8a;
+  --tracking-soft: #dde2ee;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--paper); color: var(--ink); }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px; line-height: 1.5; min-height: 100vh;
+}
+.arabic { font-family: 'IBM Plex Sans Arabic', sans-serif; direction: rtl; unicode-bidi: isolate; }
+
+/* === Top bar with logo === */
+.brandbar {
+  border-bottom: 1px solid var(--rule);
+  padding: 14px 32px;
+  background: white;
+  display: flex; align-items: center; gap: 16px;
+}
+.brandbar .logo {
+  height: 36px; width: auto;
+}
+.brandbar .product-tag {
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--muted); padding-left: 16px; border-left: 1px solid var(--rule);
+  font-weight: 500;
+}
+.brandbar .spacer { flex: 1; }
+
+/* === View toggle === */
+.view-toggle {
+  max-width: 1100px; margin: 0 auto; padding: 16px 32px 0;
+  display: flex; gap: 4px;
+}
+.view-toggle button {
+  background: transparent; border: 1px solid var(--rule); border-bottom: none;
+  padding: 10px 20px; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 500;
+  color: var(--muted); border-radius: 6px 6px 0 0; transition: all .12s;
+}
+.view-toggle button:hover { color: var(--ink); }
+.view-toggle button.active { background: var(--paper); color: var(--ink); border-color: var(--rule); }
+
+/* Header */
+header {
+  border-bottom: 1px solid var(--rule);
+  padding: 24px 32px;
+  position: sticky; top: 0; z-index: 10;
+  backdrop-filter: blur(8px);
+  background: rgba(250, 246, 238, 0.94);
+}
+.header-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap;
+}
+.title-block .eyebrow {
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--primary); font-weight: 600; margin-bottom: 8px;
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600; font-size: clamp(26px, 4vw, 38px);
+  line-height: 1.1; letter-spacing: -0.015em;
+}
+h1 em { font-style: italic; color: var(--primary); }
+.subtitle { margin-top: 10px; color: var(--muted); font-size: 14px; max-width: 580px; }
+
+/* Stats */
+.stats {
+  max-width: 1100px; margin: 24px auto 0; padding: 0 32px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;
+}
+.stat {
+  background: white; border: 1px solid var(--rule); padding: 14px 16px; border-radius: 4px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.stat-num { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 600; line-height: 1; }
+.stat-num.primary { color: var(--primary); }
+.stat-num.accent { color: var(--accent); }
+.stat-num.high { color: var(--high); }
+.stat-num.tracking { color: var(--tracking); }
+.stat-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+
+/* Toolbar */
+.toolbar {
+  max-width: 1100px; margin: 28px auto 12px; padding: 0 32px;
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+}
+.search {
+  flex: 1; min-width: 220px;
+  border: 1px solid var(--rule); border-radius: 4px; background: white;
+  padding: 10px 14px; font-family: inherit; font-size: 14px; color: var(--ink);
+}
+.search:focus { outline: none; border-color: var(--primary); }
+.filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  padding: 8px 14px; border: 1px solid var(--rule); border-radius: 100px;
+  font-size: 13px; cursor: pointer; background: white; color: var(--ink);
+  transition: all .15s; font-family: inherit;
+}
+.chip:hover { border-color: var(--ink); }
+.chip.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.chip .count { opacity: 0.55; margin-left: 4px; }
+.chip.cbam-chip { border-color: var(--primary); color: var(--primary); }
+.chip.cbam-chip.active { background: var(--primary); border-color: var(--primary); color: white; }
+.chip.tracking-chip { border-color: var(--tracking); color: var(--tracking); }
+.chip.tracking-chip.active { background: var(--tracking); border-color: var(--tracking); color: white; }
+
+.sector-filter {
+  max-width: 1100px; margin: 0 auto 16px; padding: 0 32px;
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+}
+.sector-filter .label {
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-right: 4px;
+}
+
+.btn {
+  padding: 10px 18px; border: 1px solid var(--primary); background: var(--primary); color: white;
+  font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+  border-radius: 4px; letter-spacing: 0.02em; transition: all .15s;
+}
+.btn:hover { background: var(--primary-deep); border-color: var(--primary-deep); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+.btn.ghost:hover { background: var(--ink); color: var(--paper); }
+.btn.danger:hover { background: var(--high); border-color: var(--high); color: var(--paper); }
+
+/* List */
+.list { max-width: 1100px; margin: 0 auto 60px; padding: 0 32px; }
+.sector-section { margin-bottom: 32px; }
+.sector-banner {
+  display: flex; align-items: baseline; gap: 14px;
+  padding: 14px 0 10px;
+  border-bottom: 2px solid var(--ink);
+}
+.sector-banner h2 {
+  font-family: 'Fraunces', serif; font-weight: 600; font-size: 22px;
+  letter-spacing: -0.01em; color: var(--ink);
+}
+.sector-banner .count {
+  font-size: 13px; color: var(--muted); font-style: italic;
+  font-family: 'Fraunces', serif;
+}
+.sector-banner.cbam { border-bottom-color: var(--primary); }
+.sector-banner.cbam h2 { color: var(--primary); }
+.cbam-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--primary); color: white; font-size: 10px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 100px;
+}
+
+.row {
+  display: grid; grid-template-columns: 36px 1fr auto;
+  border-top: 1px solid var(--rule);
+  padding: 18px 0;
+  align-items: start;
+  gap: 18px;
+}
+.row:last-child { border-bottom: 1px solid var(--rule); }
+.row:hover { background: rgba(216, 232, 223, 0.25); }
+.row.excluded { opacity: 0.45; }
+.row.excluded .names .en { text-decoration: line-through; }
+.row.has-tracking { background: linear-gradient(to right, rgba(74, 93, 138, 0.05), transparent 30%); }
+.row .num { font-family: 'Fraunces', serif; font-style: italic; color: var(--muted); font-size: 14px; padding-top: 2px; }
+
+.names { display: flex; flex-direction: column; gap: 4px; }
+.names .ar { font-size: 18px; font-weight: 500; color: var(--ink); }
+.names .en { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+.names .web a {
+  color: var(--primary); text-decoration: none; font-size: 13px;
+  border-bottom: 1px dotted var(--primary); padding-bottom: 1px;
+}
+.names .web .missing { color: var(--muted); font-size: 12px; font-style: italic; }
+.stage-pill-inline {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 100px; margin-top: 6px; align-self: flex-start;
+}
+
+.controls { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; min-width: 220px; }
+.toggle-grp {
+  display: inline-flex; gap: 0; border: 1px solid var(--rule); border-radius: 100px; overflow: hidden;
+  background: white;
+}
+.toggle-grp button {
+  padding: 6px 12px; border: none; background: transparent; cursor: pointer;
+  font-family: inherit; font-size: 12px; color: var(--muted); transition: all .12s;
+  border-right: 1px solid var(--rule); white-space: nowrap;
+}
+.toggle-grp button:last-child { border-right: none; }
+.connection-toggle button.active.yes { background: var(--green-tag); color: white; }
+.connection-toggle button.active.maybe { background: var(--med); color: white; }
+.connection-toggle button.active.no { background: var(--muted); color: white; }
+.priority-toggle button { font-weight: 500; }
+.priority-toggle button.active.high { background: var(--high); color: white; }
+.priority-toggle button.active.med { background: var(--med); color: white; }
+.priority-toggle button.active.low { background: var(--low); color: white; }
+
+.section-toggle {
+  background: transparent; border: 1px dashed var(--rule); padding: 6px 12px; border-radius: 100px;
+  font-size: 12px; color: var(--muted); cursor: pointer; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.section-toggle:hover { color: var(--ink); border-color: var(--ink); }
+.section-toggle.has-content { border-style: solid; border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.section-toggle.outreach.has-content { border-color: var(--tracking); color: var(--tracking); background: var(--tracking-soft); }
+.section-toggle.outreach.disabled { opacity: 0.35; pointer-events: none; }
+
+.expand-area { grid-column: 1 / -1; margin-top: 10px; display: none; }
+.expand-area.open { display: block; }
+.expand-area textarea {
+  width: 100%; min-height: 64px; resize: vertical;
+  padding: 10px 14px; border: 1px solid var(--rule); border-radius: 4px;
+  background: white; font-family: inherit; font-size: 14px; color: var(--ink); line-height: 1.5;
+}
+.expand-area textarea:focus { outline: none; border-color: var(--primary); }
+.expand-area .label-tag {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px; display: inline-block;
+}
+.expand-area.outreach {
+  background: var(--tracking-soft);
+  padding: 14px; border-radius: 4px;
+  border-left: 3px solid var(--tracking);
+}
+.expand-area.outreach .label-tag { color: var(--tracking); }
+.expand-area.outreach textarea { border-color: rgba(74, 93, 138, 0.25); background: white; }
+.stage-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.stage-pill {
+  padding: 6px 12px; border: 1px solid rgba(74, 93, 138, 0.3); border-radius: 100px;
+  background: white; cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 500;
+  color: var(--tracking); transition: all .12s; white-space: nowrap;
+}
+.stage-pill:hover { border-color: var(--tracking); }
+.stage-pill.active { background: var(--tracking); color: white; border-color: var(--tracking); }
+.stage-pill.active.engaged { background: var(--primary); border-color: var(--primary); }
+.stage-pill.active.closed { background: var(--muted); border-color: var(--muted); }
+.last-updated { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 6px; }
+
+.stage-pill-inline.requested { background: rgba(74, 93, 138, 0.12); color: var(--tracking); }
+.stage-pill-inline.made { background: rgba(74, 93, 138, 0.18); color: var(--tracking); }
+.stage-pill-inline.discussion { background: rgba(200, 136, 74, 0.18); color: var(--accent); }
+.stage-pill-inline.engaged { background: rgba(45, 106, 79, 0.18); color: var(--primary); }
+.stage-pill-inline.closed { background: rgba(122, 117, 96, 0.18); color: var(--muted); }
+
+/* Pipeline view */
+.pipeline {
+  max-width: 1100px; margin: 24px auto 60px; padding: 0 32px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;
+}
+.pipeline-col {
+  background: white; border: 1px solid var(--rule); border-radius: 6px; padding: 14px;
+  display: flex; flex-direction: column; gap: 8px; min-height: 200px;
+}
+.pipeline-col h3 {
+  font-family: 'Fraunces', serif; font-size: 16px; font-weight: 600; color: var(--ink);
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-bottom: 8px; border-bottom: 1px solid var(--rule);
+}
+.pipeline-col h3 .col-count { font-size: 12px; color: var(--muted); font-style: italic; }
+.pipeline-col.engaged h3 { color: var(--primary); }
+.pipeline-col.closed h3 { color: var(--muted); }
+.pipeline-card {
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 8px 10px;
+  font-size: 13px; cursor: pointer; transition: all .12s;
+}
+.pipeline-card:hover { border-color: var(--tracking); transform: translateY(-1px); }
+.pipeline-card .card-title { font-weight: 500; color: var(--ink); }
+.pipeline-card .card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.pipeline-empty {
+  font-size: 12px; color: var(--muted); font-style: italic; text-align: center;
+  padding: 20px 0; font-family: 'Fraunces', serif;
+}
+
+.empty {
+  text-align: center; padding: 80px 20px; color: var(--muted); font-style: italic;
+  font-family: 'Fraunces', serif; font-size: 18px;
+}
+
+.intro {
+  max-width: 1100px; margin: 0 auto 8px; padding: 16px 22px;
+  background: var(--primary-soft); border-radius: 4px;
+  border-left: 3px solid var(--primary);
+  font-size: 14px; color: var(--ink);
+}
+.intro strong { font-family: 'Fraunces', serif; font-weight: 600; }
+.intro .cbam-note {
+  display: block; margin-top: 8px; padding-top: 8px;
+  border-top: 1px solid rgba(45, 106, 79, 0.2); font-size: 13px; color: var(--ink);
+}
+
+@media (max-width: 720px) {
+  .brandbar { padding: 12px 18px; }
+  header { padding: 18px; }
+  .stats, .toolbar, .sector-filter, .list, .pipeline, .view-toggle { padding-left: 18px; padding-right: 18px; }
+  .row { grid-template-columns: 28px 1fr; }
+  .controls { grid-column: 2 / -1; align-items: flex-start; min-width: 0; }
+}
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--ink); color: var(--paper); padding: 12px 22px; border-radius: 4px;
+  font-size: 13px; opacity: 0; transition: all .25s; pointer-events: none; z-index: 100;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <a href="https://ecoryx.com" target="_blank" rel="noopener">
+    <img class="logo" src="https://ecoryx.com/wp-content/uploads/2025/12/Ecoryx9-1.svg" alt="Ecoryx" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+    <span style="display:none; font-family:'Fraunces',serif; font-weight:600; font-size:22px; color:var(--primary); letter-spacing:-0.01em;">Ecoryx</span>
+  </a>
+  <span class="product-tag">Business Development Tracker</span>
+  <div class="spacer"></div>
+</div>
+
+<div class="view-toggle">
+  <button id="view-list" class="active">Prospect list</button>
+  <button id="view-pipeline">Outreach pipeline</button>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="title-block">
+      <div class="eyebrow">Network mapping for sustainability advisory</div>
+      <h1>Help us identify potential <em>introductions</em></h1>
+      <p class="subtitle">Mark the Saudi companies in your professional network where a warm introduction would be appropriate. Once a contact is identified, Ecoryx will reach out and update outreach progress on this same page.</p>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <button class="btn" id="export-btn">Export CSV</button>
+      <button class="btn ghost danger" id="reset-btn">Reset</button>
+    </div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Companies</div></div>
+  <div class="stat"><div class="stat-num primary" id="stat-yes">0</div><div class="stat-label">Direct contact</div></div>
+  <div class="stat"><div class="stat-num accent" id="stat-maybe">0</div><div class="stat-label">Indirect contact</div></div>
+  <div class="stat"><div class="stat-num high" id="stat-high">0</div><div class="stat-label">High priority</div></div>
+  <div class="stat"><div class="stat-num tracking" id="stat-active">0</div><div class="stat-label">In progress</div></div>
+  <div class="stat"><div class="stat-num primary" id="stat-engaged">0</div><div class="stat-label">Engaged</div></div>
+</div>
+
+<div id="list-view">
+  <div class="toolbar">
+    <input type="text" class="search" id="search" placeholder="Search company by Arabic or English name…">
+    <div class="filter-group" id="filters">
+      <button class="chip active" data-filter="all">All <span class="count" id="c-all"></span></button>
+      <button class="chip cbam-chip" data-filter="cbam">CBAM-relevant <span class="count" id="c-cbam"></span></button>
+      <button class="chip" data-filter="yes">Direct contact <span class="count" id="c-yes"></span></button>
+      <button class="chip" data-filter="maybe">Indirect <span class="count" id="c-maybe"></span></button>
+      <button class="chip" data-filter="undecided">Not reviewed <span class="count" id="c-undecided"></span></button>
+      <button class="chip" data-filter="high">High priority <span class="count" id="c-high"></span></button>
+      <button class="chip tracking-chip" data-filter="active-outreach">In progress <span class="count" id="c-active"></span></button>
+      <button class="chip" data-filter="engaged">Engaged <span class="count" id="c-engaged-filter"></span></button>
+    </div>
+  </div>
+
+  <div class="sector-filter" id="sector-filter">
+    <span class="label">Sector:</span>
+  </div>
+
+  <div class="intro">
+    <strong>How to use:</strong> For each company, indicate whether you have a direct contact, an indirect contact, or no contact. For relevant introductions, set a priority and add context for Ecoryx. Once outreach is initiated by Ecoryx, the progress panel becomes available to track engagement through standard stages.
+    <span class="cbam-note">Sectors marked <strong>CBAM-relevant</strong> (cement, iron &amp; steel, aluminium, petrochemicals) face EU Carbon Border Adjustment Mechanism requirements and growing demand for carbon-management and decarbonization advisory services.</span>
+  </div>
+
+  <div class="list" id="list"></div>
+</div>
+
+<div id="pipeline-view" class="hidden">
+  <div class="pipeline" id="pipeline"></div>
+</div>
+
+<div class="toast" id="toast">Saved</div>
+
+<script>
+const COMPANIES = [{"id": 0, "en": "Al Jouf Cement", "ar": "أسمنت الجوف", "web": "aljoufcement.com.sa", "sec": "Cement"}, {"id": 1, "en": "Arabian Cement Company", "ar": "شركة الإسمنت العربية", "web": "arabiancement.com", "sec": "Cement"}, {"id": 2, "en": "City Cement Company", "ar": "شركة أسمنت المدينة", "web": "citycement.com", "sec": "Cement"}, {"id": 3, "en": "Eastern Province Cement", "ar": "أسمنت المنطقة الشرقية", "web": "epcco.com", "sec": "Cement"}, {"id": 4, "en": "Hail Cement", "ar": "أسمنت حائل", "web": "hailcement.com", "sec": "Cement"}, {"id": 5, "en": "Najran Cement", "ar": "أسمنت نجران", "web": "najrancement.com", "sec": "Cement"}, {"id": 6, "en": "Northern Region Cement", "ar": "أسمنت المنطقة الشمالية", "web": "northerncement.com.sa", "sec": "Cement"}, {"id": 7, "en": "Qassim Cement", "ar": "أسمنت القصيم", "web": "qassimcement.com", "sec": "Cement"}, {"id": 8, "en": "Riyadh Cement", "ar": "أسمنت الرياض", "web": "riyadhcement.com", "sec": "Cement"}, {"id": 9, "en": "Saudi Cement Company", "ar": "شركة الإسمنت السعودية", "web": "saudicement.com.sa", "sec": "Cement"}, {"id": 10, "en": "Southern Province Cement", "ar": "أسمنت المنطقة الجنوبية", "web": "spcc.com.sa", "sec": "Cement"}, {"id": 11, "en": "Tabuk Cement", "ar": "أسمنت تبوك", "web": "tabukcement.com", "sec": "Cement"}, {"id": 12, "en": "Umm Al-Qura Cement", "ar": "أسمنت أم القرى", "web": "uacc.com.sa", "sec": "Cement"}, {"id": 13, "en": "Yamama Cement", "ar": "أسمنت اليمامة", "web": "yamamacement.com", "sec": "Cement"}, {"id": 14, "en": "Yanbu Cement", "ar": "أسمنت ينبع", "web": "yanbucement.com", "sec": "Cement"}, {"id": 15, "en": "Al Yamamah Steel Industries", "ar": "اليمامة للصناعات الحديدية", "web": "yamamahsteel.com", "sec": "Iron & Steel"}, {"id": 16, "en": "Al-Ittefaq Steel Products", "ar": "الاتفاق للمنتجات الفولاذية", "web": "ittefaq.com", "sec": "Iron & Steel"}, {"id": 17, "en": "Al-Tuwairqi Holding", "ar": "مجموعة الطويرقي القابضة", "web": "tuwairqi.com", "sec": "Iron & Steel"}, {"id": 18, "en": "Arabian Pipes Company", "ar": "شركة الأنابيب العربية", "web": "arabianpipes.com", "sec": "Iron & Steel"}, {"id": 19, "en": "Group Five Pipe Saudi", "ar": "شركة جروب فايف السعودية للأنابيب", "web": "group5pipe.com", "sec": "Iron & Steel"}, {"id": 20, "en": "Hadeed - Saudi Iron & Steel", "ar": "حديد - الحديد والصلب السعودية", "web": "hadeed.sabic.com", "sec": "Iron & Steel"}, {"id": 21, "en": "Rajhi Steel Industries", "ar": "الراجحي للصناعات الحديدية", "web": "rajhisteel.com", "sec": "Iron & Steel"}, {"id": 22, "en": "Saudi Steel Pipe Company", "ar": "شركة الأنابيب السعودية", "web": "sspipe.com", "sec": "Iron & Steel"}, {"id": 23, "en": "Zamil Steel Industries", "ar": "الزامل للحديد", "web": "zamilsteel.com", "sec": "Iron & Steel"}, {"id": 24, "en": "Aluminum International Co. (ALINCO)", "ar": "الألمنيوم الدولية - ألينكو", "web": "", "sec": "Aluminium & Mining"}, {"id": 25, "en": "Alupco - Aluminum Products Co.", "ar": "ألوبكو - شركة الألمنيوم العربية", "web": "alupco.com", "sec": "Aluminium & Mining"}, {"id": 26, "en": "AMCO - Advanced Metals Company", "ar": "شركة المعادن المتقدمة", "web": "", "sec": "Aluminium & Mining"}, {"id": 27, "en": "Ma'aden", "ar": "معادن", "web": "maaden.com.sa", "sec": "Aluminium & Mining"}, {"id": 28, "en": "Ma'aden Aluminium", "ar": "معادن للألمنيوم", "web": "maaden.com.sa", "sec": "Aluminium & Mining"}, {"id": 29, "en": "Advanced Petrochemical Company", "ar": "الشركة المتقدمة للبتروكيماويات", "web": "advancedpetrochem.com", "sec": "Petrochemicals & Fertilisers"}, {"id": 30, "en": "Petro Rabigh", "ar": "بترو رابغ", "web": "petrorabigh.com", "sec": "Petrochemicals & Fertilisers"}, {"id": 31, "en": "Petrochem - National Petrochemical Co.", "ar": "بتروكيم - الشركة الوطنية للبتروكيماويات", "web": "natpetrochem.com", "sec": "Petrochemicals & Fertilisers"}, {"id": 32, "en": "SABIC", "ar": "سابك", "web": "sabic.com", "sec": "Petrochemicals & Fertilisers"}, {"id": 33, "en": "SABIC Agri-Nutrients", "ar": "سابك للمغذيات الزراعية", "web": "sabicagri-nutrients.com", "sec": "Petrochemicals & Fertilisers"}, {"id": 34, "en": "Saudi Kayan", "ar": "كيان السعودية", "web": "saudikayan.com", "sec": "Petrochemicals & Fertilisers"}, {"id": 35, "en": "Sipchem - Saudi International Petrochemical Co.", "ar": "سبكيم - الشركة السعودية العالمية للبتروكيماويات", "web": "sipchem.com", "sec": "Petrochemicals & Fertilisers"}, {"id": 36, "en": "Tasnee - National Industrialization Co.", "ar": "التصنيع الوطنية", "web": "tasnee.com", "sec": "Petrochemicals & Fertilisers"}, {"id": 37, "en": "Yansab", "ar": "ينساب", "web": "yansab.com.sa", "sec": "Petrochemicals & Fertilisers"}, {"id": 38, "en": "ACWA Power", "ar": "أكوا باور", "web": "acwapower.com", "sec": "Energy, Utilities & Oil Services"}, {"id": 39, "en": "ADES Holding", "ar": "أديس", "web": "adesgroup.com", "sec": "Energy, Utilities & Oil Services"}, {"id": 40, "en": "Al-Khafji Joint Operations", "ar": "الخفجي للعمليات المشتركة", "web": "kjo.com.sa", "sec": "Energy, Utilities & Oil Services"}, {"id": 41, "en": "Aldrees Petroleum & Transport Services", "ar": "شركة الدريس للخدمات البترولية والنقليات", "web": "aldrees.com", "sec": "Energy, Utilities & Oil Services"}, {"id": 42, "en": "ARO Drilling", "ar": "أرو للحفر", "web": "arodrilling.com", "sec": "Energy, Utilities & Oil Services"}, {"id": 43, "en": "Gasco - National Gas & Industrialization Co.", "ar": "شركة الغاز والتصنيع الأهلية - غاز", "web": "gasco.com.sa", "sec": "Energy, Utilities & Oil Services"}, {"id": 44, "en": "Saudi Electricity Company", "ar": "الشركة السعودية للكهرباء", "web": "se.com.sa", "sec": "Energy, Utilities & Oil Services"}, {"id": 45, "en": "Zamil Offshore", "ar": "الزامل البحرية", "web": "zamiloffshore.com", "sec": "Energy, Utilities & Oil Services"}, {"id": 46, "en": "Luberef - Saudi Aramco Base Oil Co.", "ar": "لوبريف - أرامكو السعودية لزيوت الأساس", "web": "luberef.com.sa", "sec": "Oil Refining"}, {"id": 47, "en": "SAMREF - Saudi Aramco Mobil Refinery", "ar": "سامرف - مصفاة أرامكو السعودية موبيل", "web": "samref.com.sa", "sec": "Oil Refining"}, {"id": 48, "en": "SATORP - Saudi Aramco Total Refining & Petrochemical", "ar": "ساتورب - أرامكو السعودية وتوتال للتكرير والبتروكيماويات", "web": "satorp.com", "sec": "Oil Refining"}, {"id": 49, "en": "YASREF - Yanbu Aramco Sinopec Refining", "ar": "ياسرف - ينبع أرامكو سينوبك للتكرير", "web": "yasref.com", "sec": "Oil Refining"}, {"id": 50, "en": "Al Rajhi Bank", "ar": "مصرف الراجحي", "web": "alrajhibank.com.sa", "sec": "Banks & Finance"}, {"id": 51, "en": "AL Rajhi Takaful", "ar": "الراجحي للتأمين التعاوني", "web": "alrajhitakaful.com", "sec": "Banks & Finance"}, {"id": 52, "en": "Bupa Arabia", "ar": "شركة بوبا العربية للتأمين التعاوني", "web": "bupa.com.sa", "sec": "Banks & Finance"}, {"id": 53, "en": "Emkan Finance", "ar": "إمكان للتمويل", "web": "emkanfinance.com.sa", "sec": "Banks & Finance"}, {"id": 54, "en": "Riyad Bank", "ar": "بنك الرياض", "web": "riyadbank.com", "sec": "Banks & Finance"}, {"id": 55, "en": "Saudi Central Bank (SAMA)", "ar": "البنك المركزي السعودي", "web": "sama.gov.sa", "sec": "Banks & Finance"}, {"id": 56, "en": "Saudi National Bank (SNB)", "ar": "البنك الأهلي السعودي", "web": "alahli.com", "sec": "Banks & Finance"}, {"id": 57, "en": "SNB Capital", "ar": "الأهلي كابيتال", "web": "snbcapital.com", "sec": "Banks & Finance"}, {"id": 58, "en": "Tawuniya - Cooperative Insurance Co.", "ar": "الشركة التعاونية للتأمين", "web": "tawuniya.com", "sec": "Banks & Finance"}, {"id": 59, "en": "Communications, Space & Technology Commission (CST)", "ar": "هيئة الاتصالات والفضاء والتقنية", "web": "cst.gov.sa", "sec": "Government & Authorities"}, {"id": 60, "en": "Environment Fund", "ar": "صندوق البيئة", "web": "ef.gov.sa", "sec": "Government & Authorities"}, {"id": 61, "en": "National Cybersecurity Authority", "ar": "الهيئة الوطنية للأمن السيبراني", "web": "nca.gov.sa", "sec": "Government & Authorities"}, {"id": 62, "en": "National Development Fund (NDF)", "ar": "صندوق التنمية الوطني", "web": "ndf.gov.sa", "sec": "Government & Authorities"}, {"id": 63, "en": "SEEC - Saudi Energy Efficiency Center", "ar": "المركز السعودي لكفاءة الطاقة", "web": "seec.gov.sa", "sec": "Government & Authorities"}, {"id": 64, "en": "Go Telecom", "ar": "جو تيليكوم", "web": "go.com.sa", "sec": "Telecom"}, {"id": 65, "en": "Mobily (Etihad Etisalat)", "ar": "موبايلي - اتحاد اتصالات", "web": "mobily.com.sa", "sec": "Telecom"}, {"id": 66, "en": "Solutions by stc", "ar": "سلوشنز", "web": "solutions.com.sa", "sec": "Telecom"}, {"id": 67, "en": "stc Group", "ar": "مجموعة stc", "web": "stc.com.sa", "sec": "Telecom"}, {"id": 68, "en": "Zain KSA", "ar": "زين السعودية", "web": "sa.zain.com", "sec": "Telecom"}, {"id": 69, "en": "Alat", "ar": "علات", "web": "alat.com", "sec": "Technology & Digital"}, {"id": 70, "en": "Cyberani by Aramco Digital", "ar": "سايبراني", "web": "cyberani.com.sa", "sec": "Technology & Digital"}, {"id": 71, "en": "Foodics", "ar": "فودكس", "web": "foodics.com", "sec": "Technology & Digital"}, {"id": 72, "en": "Sela", "ar": "سيلا", "web": "sela.sa", "sec": "Technology & Digital"}, {"id": 73, "en": "Thiqah Business Services", "ar": "ثقة لخدمات الأعمال", "web": "thiqah.sa", "sec": "Technology & Digital"}, {"id": 74, "en": "Unifonic", "ar": "يونيفونيك", "web": "unifonic.com", "sec": "Technology & Digital"}, {"id": 75, "en": "Alfanar", "ar": "الفنار", "web": "alfanar.com", "sec": "Construction & Engineering"}, {"id": 76, "en": "Almabani General Contractors", "ar": "المباني للمقاولات العامة", "web": "almabani.com", "sec": "Construction & Engineering"}, {"id": 77, "en": "BEC Arabia Contracting Company", "ar": "شركة بيك العربية للمقاولات", "web": "", "sec": "Construction & Engineering"}, {"id": 78, "en": "Electrical Industries Co. (EIC)", "ar": "شركة الصناعات الكهربائية", "web": "eic.com.sa", "sec": "Construction & Engineering"}, {"id": 79, "en": "Nesma Group", "ar": "مجموعة نسما", "web": "nesma.com", "sec": "Construction & Engineering"}, {"id": 80, "en": "Rawabi Holding", "ar": "مجموعة روابي القابضة", "web": "rawabiholding.com", "sec": "Construction & Engineering"}, {"id": 81, "en": "Riyadh Cables Group", "ar": "شركة مجموعة كابلات الرياض", "web": "riyadhcables.com", "sec": "Construction & Engineering"}, {"id": 82, "en": "Saudi Cable Company", "ar": "شركة الكابلات السعودية", "web": "saudicable.com", "sec": "Construction & Engineering"}, {"id": 83, "en": "Saudi Ceramics", "ar": "شركة الخزف السعودي", "web": "saudiceramics.com", "sec": "Construction & Engineering"}, {"id": 84, "en": "Zamil Group", "ar": "مجموعة الزامل", "web": "zamil.com", "sec": "Construction & Engineering"}, {"id": 85, "en": "Artar Group", "ar": "مجموعة الطار", "web": "artar.com.sa", "sec": "Real Estate & Development"}, {"id": 86, "en": "KAFD - King Abdullah Financial District", "ar": "مركز الملك عبدالله المالي", "web": "kafd.sa", "sec": "Real Estate & Development"}, {"id": 87, "en": "NHC - National Housing Company", "ar": "الشركة الوطنية للإسكان", "web": "nhc.sa", "sec": "Real Estate & Development"}, {"id": 88, "en": "Retal Urban Development", "ar": "ريتال للتطوير العمراني", "web": "retal.com.sa", "sec": "Real Estate & Development"}, {"id": 89, "en": "Ajlan & Bros", "ar": "مجموعة عجلان وإخوانه", "web": "ajlangroup.com", "sec": "Food, Retail & Consumer"}, {"id": 90, "en": "AL JOUF Agricultural Development Co.", "ar": "شركة الجوف للتنمية الزراعية", "web": "aljouf.com.sa", "sec": "Food, Retail & Consumer"}, {"id": 91, "en": "Almarai", "ar": "المراعي", "web": "almarai.com", "sec": "Food, Retail & Consumer"}, {"id": 92, "en": "Alsulaiman Group", "ar": "مجموعة السليمان", "web": "alsulaiman.com", "sec": "Food, Retail & Consumer"}, {"id": 93, "en": "Arab Agricultural & Industrial Investment Co.", "ar": "الشركة العربية للاستثمار الزراعي والصناعي", "web": "", "sec": "Food, Retail & Consumer"}, {"id": 94, "en": "Catrion Catering Holding", "ar": "كاتريون", "web": "catrion.com", "sec": "Food, Retail & Consumer"}, {"id": 95, "en": "Extra - United Electronics Co.", "ar": "إكسترا - الإلكترونيات المتحدة", "web": "extra.com", "sec": "Food, Retail & Consumer"}, {"id": 96, "en": "Jarir Marketing Co.", "ar": "شركة جرير للتسويق", "web": "jarir.com", "sec": "Food, Retail & Consumer"}, {"id": 97, "en": "Leejam Sports Company (Fitness Time)", "ar": "ليجام للرياضة - وقت اللياقة", "web": "fitnesstime.com.sa", "sec": "Food, Retail & Consumer"}, {"id": 98, "en": "Naqi Water Company", "ar": "شركة نقي للمياه", "web": "naqiwater.com", "sec": "Food, Retail & Consumer"}, {"id": 99, "en": "Obeikan Group", "ar": "مجموعة العبيكان", "web": "obeikan.com.sa", "sec": "Food, Retail & Consumer"}, {"id": 100, "en": "Olayan Group", "ar": "مجموعة العليان", "web": "olayan.com", "sec": "Food, Retail & Consumer"}, {"id": 101, "en": "Panda Retail", "ar": "أسواق بنده", "web": "panda.com.sa", "sec": "Food, Retail & Consumer"}, {"id": 102, "en": "SADAFCO - Saudi Dairy & Foodstuff Co.", "ar": "الشركة السعودية لمنتجات الألبان والأغذية - سدافكو", "web": "sadafco.com", "sec": "Food, Retail & Consumer"}, {"id": 103, "en": "SASCO - Saudi Automotive Services Co.", "ar": "الشركة السعودية لخدمات السيارات والمعدات", "web": "sasco.com.sa", "sec": "Food, Retail & Consumer"}, {"id": 104, "en": "Savola Group", "ar": "مجموعة صافولا", "web": "savola.com", "sec": "Food, Retail & Consumer"}, {"id": 105, "en": "Tanmiah Food Company", "ar": "شركة التنمية الغذائية - تنمية", "web": "tanmiah.com", "sec": "Food, Retail & Consumer"}, {"id": 106, "en": "Avalon Pharma - Middle East Pharmaceutical Industries", "ar": "شركة الشرق الأوسط للصناعات الدوائية - أفالون فارما", "web": "avalonpharma.com", "sec": "Healthcare"}, {"id": 107, "en": "Dallah Healthcare", "ar": "شركة دله للخدمات الصحية", "web": "dallah-hospital.com", "sec": "Healthcare"}, {"id": 108, "en": "Dr. Sulaiman Al Habib Medical Group (HMG)", "ar": "مجموعة الدكتور سليمان الحبيب الطبية", "web": "hmg.com", "sec": "Healthcare"}, {"id": 109, "en": "Fakeeh Care Group", "ar": "شركة مستشفى الدكتور سليمان عبدالقادر فقيه", "web": "fakeeh.care", "sec": "Healthcare"}, {"id": 110, "en": "Jamjoom Pharma", "ar": "شركة مصنع جمجوم للأدوية", "web": "jamjoompharma.com", "sec": "Healthcare"}, {"id": 111, "en": "King Faisal Specialist Hospital (KFSHI)", "ar": "مستشفى الملك فيصل التخصصي ومركز الأبحاث", "web": "kfshrc.edu.sa", "sec": "Healthcare"}, {"id": 112, "en": "Mouwasat Medical Services", "ar": "شركة المواساة للخدمات الطبية", "web": "mouwasat.com", "sec": "Healthcare"}, {"id": 113, "en": "Nahdi Medical Co.", "ar": "النهدي الطبية", "web": "nahdi.sa", "sec": "Healthcare"}, {"id": 114, "en": "Specialized Medical Co. (SMC)", "ar": "الشركة الطبية التخصصية", "web": "smc.com.sa", "sec": "Healthcare"}, {"id": 115, "en": "Astra Industrial Group", "ar": "مجموعة أسترا الصناعية", "web": "astraindustrial.com", "sec": "Logistics & Industrial"}, {"id": 116, "en": "Bahri - National Shipping Co.", "ar": "البحري", "web": "bahri.sa", "sec": "Logistics & Industrial"}, {"id": 117, "en": "FIPCO - Filing & Packing Materials Manufacturing", "ar": "شركة تصنيع مواد التعبئة والتغليف - فيبكو", "web": "fipco.com.sa", "sec": "Logistics & Industrial"}, {"id": 118, "en": "Flynas", "ar": "شركة طيران ناس", "web": "flynas.com", "sec": "Logistics & Industrial"}, {"id": 119, "en": "FMTECH - Saudi Facility Management", "ar": "إف إم تك لإدارة المرافق", "web": "", "sec": "Logistics & Industrial"}, {"id": 120, "en": "MEPCO - Middle East Paper Company", "ar": "شركة الورق العربية", "web": "mepco.biz", "sec": "Logistics & Industrial"}, {"id": 121, "en": "Obeikan Glass", "ar": "شركة العبيكان للزجاج", "web": "obeikanglass.com", "sec": "Logistics & Industrial"}, {"id": 122, "en": "Saudia Cargo", "ar": "الخطوط السعودية للشحن", "web": "saudiacargo.com", "sec": "Logistics & Industrial"}, {"id": 123, "en": "Zoujaj - National Glass Industries Co.", "ar": "شركة الصناعات الزجاجية الوطنية - زجاج", "web": "zoujaj.com", "sec": "Logistics & Industrial"}];
+const SECTORS = [{"name": "Cement", "cbam": true}, {"name": "Iron & Steel", "cbam": true}, {"name": "Aluminium & Mining", "cbam": true}, {"name": "Petrochemicals & Fertilisers", "cbam": true}, {"name": "Energy, Utilities & Oil Services", "cbam": false}, {"name": "Oil Refining", "cbam": false}, {"name": "Banks & Finance", "cbam": false}, {"name": "Government & Authorities", "cbam": false}, {"name": "Telecom", "cbam": false}, {"name": "Technology & Digital", "cbam": false}, {"name": "Construction & Engineering", "cbam": false}, {"name": "Real Estate & Development", "cbam": false}, {"name": "Food, Retail & Consumer", "cbam": false}, {"name": "Healthcare", "cbam": false}, {"name": "Logistics & Industrial", "cbam": false}];
+const STORAGE_KEY = 'ecoryx_bd_v4';
+
+const STAGES = [
+  { id: 'requested',  label: 'Introduction requested' },
+  { id: 'made',       label: 'Introduction completed' },
+  { id: 'discussion', label: 'In discussion' },
+  { id: 'engaged',    label: 'Engaged' },
+  { id: 'closed',     label: 'Closed' },
+];
+
+function loadState() {
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return {}; return JSON.parse(raw); }
+  catch (e) { return {}; }
+}
+function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
+let state = loadState();
+
+function getEntry(id) {
+  if (!state[id]) state[id] = {
+    connection: null, priority: null, comment: '',
+    outreachStage: null, outreachNotes: '', lastUpdated: null
+  };
+  const e = state[id];
+  if (!('outreachStage' in e)) e.outreachStage = null;
+  if (!('outreachNotes' in e)) e.outreachNotes = '';
+  if (!('lastUpdated' in e)) e.lastUpdated = null;
+  return e;
+}
+
+let activeFilter = 'all';
+let activeSector = 'all';
+let searchTerm = '';
+let activeView = 'list';
+
+const listEl = document.getElementById('list');
+const sectorFilterEl = document.getElementById('sector-filter');
+const pipelineEl = document.getElementById('pipeline');
+
+function buildSectorChips() {
+  const allChip = document.createElement('button');
+  allChip.className = 'chip active';
+  allChip.dataset.sector = 'all';
+  allChip.textContent = 'All sectors';
+  sectorFilterEl.appendChild(allChip);
+  SECTORS.forEach(s => {
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (s.cbam ? ' cbam-chip' : '');
+    chip.dataset.sector = s.name;
+    chip.textContent = s.name;
+    sectorFilterEl.appendChild(chip);
+  });
+  sectorFilterEl.addEventListener('click', (ev) => {
+    if (ev.target.tagName !== 'BUTTON') return;
+    sectorFilterEl.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    ev.target.classList.add('active');
+    activeSector = ev.target.dataset.sector;
+    render();
+  });
+}
+
+function applyFilters(c) {
+  const e = state[c.id] || {};
+  if (searchTerm) {
+    const t = searchTerm.toLowerCase();
+    if (!c.en.toLowerCase().includes(t) && !c.ar.includes(searchTerm)) return false;
+  }
+  if (activeSector !== 'all' && c.sec !== activeSector) return false;
+  if (activeFilter === 'cbam') {
+    const cbamSectors = SECTORS.filter(s => s.cbam).map(s => s.name);
+    if (!cbamSectors.includes(c.sec)) return false;
+  }
+  if (activeFilter === 'yes') return e.connection === 'yes';
+  if (activeFilter === 'maybe') return e.connection === 'maybe';
+  if (activeFilter === 'undecided') return !e.connection;
+  if (activeFilter === 'high') return e.priority === 'high';
+  if (activeFilter === 'active-outreach') {
+    return e.outreachStage && e.outreachStage !== 'engaged' && e.outreachStage !== 'closed';
+  }
+  if (activeFilter === 'engaged') return e.outreachStage === 'engaged';
+  return true;
+}
+
+function render() {
+  if (activeView === 'pipeline') { renderPipeline(); return; }
+  listEl.innerHTML = '';
+  const filtered = COMPANIES.filter(applyFilters);
+  if (filtered.length === 0) {
+    listEl.innerHTML = '<div class="empty">No companies match your filter.</div>';
+    updateStats();
+    return;
+  }
+  let displayNum = 0;
+  SECTORS.forEach(sectorObj => {
+    const items = filtered.filter(c => c.sec === sectorObj.name);
+    if (items.length === 0) return;
+    const section = document.createElement('div');
+    section.className = 'sector-section';
+    const banner = document.createElement('div');
+    banner.className = 'sector-banner' + (sectorObj.cbam ? ' cbam' : '');
+    banner.innerHTML = `
+      <h2>${escapeHtml(sectorObj.name)}</h2>
+      ${sectorObj.cbam ? '<span class="cbam-badge">CBAM</span>' : ''}
+      <span class="count">${items.length} ${items.length === 1 ? 'company' : 'companies'}</span>
+    `;
+    section.appendChild(banner);
+    items.forEach(c => { displayNum += 1; section.appendChild(rowFor(c, displayNum)); });
+    listEl.appendChild(section);
+  });
+  updateStats();
+}
+
+function rowFor(c, displayNum) {
+  const e = getEntry(c.id);
+  const row = document.createElement('div');
+  const conn = e.connection;
+  const prio = e.priority;
+  const stage = e.outreachStage;
+  const hasComment = e.comment && e.comment.trim();
+  const hasOutreach = !!stage;
+  const outreachAvailable = (conn === 'yes' || conn === 'maybe');
+
+  let cls = 'row';
+  if (conn === 'no') cls += ' excluded';
+  if (hasOutreach) cls += ' has-tracking';
+  row.className = cls;
+  row.dataset.id = c.id;
+
+  const arEl = c.ar ? `<div class="ar arabic">${escapeHtml(c.ar)}</div>` : '';
+  const webEl = c.web
+    ? `<div class="web"><a href="https://${escapeHtml(c.web)}" target="_blank" rel="noopener">${escapeHtml(c.web)} ↗</a></div>`
+    : `<div class="web"><span class="missing">website not on file</span></div>`;
+  const stageBadge = stage
+    ? `<span class="stage-pill-inline ${stage}">${escapeHtml(STAGES.find(s => s.id === stage).label)}</span>`
+    : '';
+
+  row.innerHTML = `
+    <div class="num">${displayNum.toString().padStart(2, '0')}</div>
+    <div class="names">
+      ${arEl}
+      <div class="en">${escapeHtml(c.en)}</div>
+      ${webEl}
+      ${stageBadge}
+    </div>
+    <div class="controls">
+      <div class="toggle-grp connection-toggle" data-control="connection">
+        <button class="yes ${conn === 'yes' ? 'active' : ''}" data-val="yes">Direct</button>
+        <button class="maybe ${conn === 'maybe' ? 'active' : ''}" data-val="maybe">Indirect</button>
+        <button class="no ${conn === 'no' ? 'active' : ''}" data-val="no">None</button>
+      </div>
+      <div class="toggle-grp priority-toggle" data-control="priority" style="${outreachAvailable ? '' : 'opacity:0.4;pointer-events:none;'}">
+        <button class="high ${prio === 'high' ? 'active' : ''}" data-val="high">High</button>
+        <button class="med ${prio === 'med' ? 'active' : ''}" data-val="med">Med</button>
+        <button class="low ${prio === 'low' ? 'active' : ''}" data-val="low">Low</button>
+      </div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+        <button class="section-toggle ${hasComment ? 'has-content' : ''}" data-control="comment-toggle">
+          ${hasComment ? 'Edit context' : 'Add context'}
+        </button>
+        <button class="section-toggle outreach ${hasOutreach ? 'has-content' : ''} ${outreachAvailable ? '' : 'disabled'}" data-control="outreach-toggle">
+          ${hasOutreach ? 'Update progress' : 'Track outreach'}
+        </button>
+      </div>
+    </div>
+    <div class="expand-area comment-area">
+      <span class="label-tag">Context for Ecoryx</span>
+      <textarea placeholder="Who you know at the company, suggested approach, any relevant background…">${escapeHtml(e.comment || '')}</textarea>
+    </div>
+    <div class="expand-area outreach outreach-area">
+      <span class="label-tag">Outreach progress</span>
+      <div class="stage-row">
+        ${STAGES.map(s => `
+          <button class="stage-pill ${s.id} ${stage === s.id ? 'active' : ''}" data-stage="${s.id}">${escapeHtml(s.label)}</button>
+        `).join('')}
+      </div>
+      <textarea placeholder="Engagement notes — date of introduction, conversation summary, next steps…">${escapeHtml(e.outreachNotes || '')}</textarea>
+      ${e.lastUpdated ? `<div class="last-updated">Last updated: ${new Date(e.lastUpdated).toLocaleString()}</div>` : ''}
+    </div>
+  `;
+
+  row.querySelector('[data-control="connection"]').addEventListener('click', (ev) => {
+    if (ev.target.tagName !== 'BUTTON') return;
+    const val = ev.target.dataset.val;
+    e.connection = (e.connection === val) ? null : val;
+    if (e.connection !== 'yes' && e.connection !== 'maybe') {
+      e.priority = null;
+      e.outreachStage = null;
+    }
+    saveAndRefresh();
+  });
+
+  row.querySelector('[data-control="priority"]').addEventListener('click', (ev) => {
+    if (ev.target.tagName !== 'BUTTON') return;
+    const val = ev.target.dataset.val;
+    e.priority = (e.priority === val) ? null : val;
+    saveAndRefresh();
+  });
+
+  const commentTextarea = row.querySelector('.comment-area textarea');
+  const commentArea = row.querySelector('.comment-area');
+  row.querySelector('[data-control="comment-toggle"]').addEventListener('click', () => {
+    commentArea.classList.toggle('open');
+    if (commentArea.classList.contains('open')) commentTextarea.focus();
+  });
+  if (hasComment) commentArea.classList.add('open');
+  commentTextarea.addEventListener('input', () => {
+    e.comment = commentTextarea.value;
+    clearTimeout(commentTextarea._t);
+    commentTextarea._t = setTimeout(() => { saveState(); updateStats(); refreshFilterCounts(); flashSaved(); }, 400);
+  });
+
+  const outreachTextarea = row.querySelector('.outreach-area textarea');
+  const outreachArea = row.querySelector('.outreach-area');
+  const outreachBtn = row.querySelector('[data-control="outreach-toggle"]');
+  outreachBtn.addEventListener('click', () => {
+    if (outreachBtn.classList.contains('disabled')) return;
+    outreachArea.classList.toggle('open');
+  });
+  if (hasOutreach) outreachArea.classList.add('open');
+  row.querySelectorAll('.outreach-area .stage-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = btn.dataset.stage;
+      e.outreachStage = (e.outreachStage === val) ? null : val;
+      e.lastUpdated = new Date().toISOString();
+      saveAndRefresh();
+    });
+  });
+  outreachTextarea.addEventListener('input', () => {
+    e.outreachNotes = outreachTextarea.value;
+    e.lastUpdated = new Date().toISOString();
+    clearTimeout(outreachTextarea._t);
+    outreachTextarea._t = setTimeout(() => { saveState(); updateStats(); refreshFilterCounts(); flashSaved(); }, 400);
+  });
+
+  return row;
+}
+
+function renderPipeline() {
+  pipelineEl.innerHTML = '';
+  const cols = STAGES.map(s => ({ ...s, items: [] }));
+  COMPANIES.forEach(c => {
+    const e = state[c.id] || {};
+    if (!e.outreachStage) return;
+    const col = cols.find(co => co.id === e.outreachStage);
+    if (col) col.items.push({ company: c, entry: e });
+  });
+  cols.forEach(col => {
+    const colEl = document.createElement('div');
+    colEl.className = 'pipeline-col' + (col.id === 'engaged' ? ' engaged' : '') + (col.id === 'closed' ? ' closed' : '');
+    colEl.innerHTML = `<h3>${escapeHtml(col.label)} <span class="col-count">${col.items.length}</span></h3>`;
+    if (col.items.length === 0) {
+      const e = document.createElement('div');
+      e.className = 'pipeline-empty';
+      e.textContent = '— empty —';
+      colEl.appendChild(e);
+    } else {
+      col.items.forEach(({ company, entry }) => {
+        const card = document.createElement('div');
+        card.className = 'pipeline-card';
+        const updatedBit = entry.lastUpdated
+          ? `<div class="card-sub">${new Date(entry.lastUpdated).toLocaleDateString()}</div>` : '';
+        card.innerHTML = `
+          <div class="card-title">${escapeHtml(company.en)}</div>
+          <div class="card-sub">${escapeHtml(company.sec)}</div>
+          ${updatedBit}
+        `;
+        card.addEventListener('click', () => {
+          activeView = 'list';
+          document.getElementById('view-list').classList.add('active');
+          document.getElementById('view-pipeline').classList.remove('active');
+          document.getElementById('list-view').classList.remove('hidden');
+          document.getElementById('pipeline-view').classList.add('hidden');
+          render();
+          setTimeout(() => {
+            const rowEl = document.querySelector(`.row[data-id="${company.id}"]`);
+            if (rowEl) {
+              rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              rowEl.style.transition = 'background .3s';
+              rowEl.style.background = 'var(--tracking-soft)';
+              setTimeout(() => { rowEl.style.background = ''; }, 1500);
+            }
+          }, 60);
+        });
+        colEl.appendChild(card);
+      });
+    }
+    pipelineEl.appendChild(colEl);
+  });
+  updateStats();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+function saveAndRefresh() { saveState(); render(); flashSaved(); }
+
+function updateStats() {
+  let yes = 0, maybe = 0, high = 0, active = 0, engaged = 0;
+  COMPANIES.forEach(c => {
+    const e = state[c.id] || {};
+    if (e.connection === 'yes') yes++;
+    if (e.connection === 'maybe') maybe++;
+    if (e.priority === 'high') high++;
+    if (e.outreachStage && e.outreachStage !== 'engaged' && e.outreachStage !== 'closed') active++;
+    if (e.outreachStage === 'engaged') engaged++;
+  });
+  document.getElementById('stat-total').textContent = COMPANIES.length;
+  document.getElementById('stat-yes').textContent = yes;
+  document.getElementById('stat-maybe').textContent = maybe;
+  document.getElementById('stat-high').textContent = high;
+  document.getElementById('stat-active').textContent = active;
+  document.getElementById('stat-engaged').textContent = engaged;
+  refreshFilterCounts();
+}
+
+function refreshFilterCounts() {
+  const cbamSectors = SECTORS.filter(s => s.cbam).map(s => s.name);
+  let yes = 0, maybe = 0, undecided = 0, high = 0, cbam = 0, active = 0, engaged = 0;
+  COMPANIES.forEach(c => {
+    const e = state[c.id] || {};
+    if (e.connection === 'yes') yes++;
+    if (e.connection === 'maybe') maybe++;
+    if (!e.connection) undecided++;
+    if (e.priority === 'high') high++;
+    if (cbamSectors.includes(c.sec)) cbam++;
+    if (e.outreachStage && e.outreachStage !== 'engaged' && e.outreachStage !== 'closed') active++;
+    if (e.outreachStage === 'engaged') engaged++;
+  });
+  document.getElementById('c-all').textContent = `(${COMPANIES.length})`;
+  document.getElementById('c-cbam').textContent = `(${cbam})`;
+  document.getElementById('c-yes').textContent = `(${yes})`;
+  document.getElementById('c-maybe').textContent = `(${maybe})`;
+  document.getElementById('c-undecided').textContent = `(${undecided})`;
+  document.getElementById('c-high').textContent = `(${high})`;
+  document.getElementById('c-active').textContent = `(${active})`;
+  document.getElementById('c-engaged-filter').textContent = `(${engaged})`;
+}
+
+document.getElementById('search').addEventListener('input', (e) => { searchTerm = e.target.value.trim(); render(); });
+document.querySelectorAll('#filters .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#filters .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.dataset.filter;
+    render();
+  });
+});
+
+document.getElementById('view-list').addEventListener('click', () => {
+  activeView = 'list';
+  document.getElementById('view-list').classList.add('active');
+  document.getElementById('view-pipeline').classList.remove('active');
+  document.getElementById('list-view').classList.remove('hidden');
+  document.getElementById('pipeline-view').classList.add('hidden');
+  render();
+});
+document.getElementById('view-pipeline').addEventListener('click', () => {
+  activeView = 'pipeline';
+  document.getElementById('view-pipeline').classList.add('active');
+  document.getElementById('view-list').classList.remove('active');
+  document.getElementById('pipeline-view').classList.remove('hidden');
+  document.getElementById('list-view').classList.add('hidden');
+  render();
+});
+
+document.getElementById('export-btn').addEventListener('click', () => {
+  const headers = ['#', 'Sector', 'CBAM-Relevant', 'English Name', 'Arabic Name', 'Website',
+                   'Contact Type', 'Priority', 'Context Note',
+                   'Outreach Stage', 'Outreach Notes', 'Last Updated'];
+  const cbamSectors = SECTORS.filter(s => s.cbam).map(s => s.name);
+  const labels = { yes: 'Direct', maybe: 'Indirect', no: 'None' };
+  const rows = COMPANIES.map((c, i) => {
+    const e = state[c.id] || {};
+    const stageLabel = e.outreachStage ? STAGES.find(s => s.id === e.outreachStage).label : '';
+    return [
+      i + 1, c.sec, cbamSectors.includes(c.sec) ? 'Yes' : 'No',
+      c.en, c.ar || '', c.web || '',
+      labels[e.connection] || '', e.priority || '',
+      (e.comment || '').replace(/\r?\n/g, ' '),
+      stageLabel, (e.outreachNotes || '').replace(/\r?\n/g, ' '),
+      e.lastUpdated ? new Date(e.lastUpdated).toLocaleString() : ''
+    ];
+  });
+  const csv = [headers, ...rows].map(r => r.map(cell => {
+    const s = String(cell);
+    if (s.includes(',') || s.includes('"') || s.includes('\n')) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  }).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().split('T')[0];
+  a.href = url;
+  a.download = `ecoryx_bd_${date}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('CSV exported.');
+});
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+  if (confirm('This will erase all entries, priorities, context notes, and outreach progress. Continue?')) {
+    state = {}; saveState(); render(); showToast('All cleared.');
+  }
+});
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+function flashSaved() { showToast('Saved'); }
+
+buildSectorChips();
+render();
+</script>
+</body>
+</html>
