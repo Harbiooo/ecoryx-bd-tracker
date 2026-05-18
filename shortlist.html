@@ -12,13 +12,13 @@ body{font-family:Arial,sans-serif;background:#faf6ee;color:#1a2622;margin:0}.wra
 <div class="wrap">
 <div class="box">
 <h1>Ecoryx Connection Shortlist</h1>
-<p class="sub">Please enter your name and tick only the companies where you know someone. No contact details are needed at this stage. After selecting the companies, click Generate report and send the generated summary to Ahmed.</p>
+<p class="sub">Please enter your name and tick only the companies where you know someone. After selecting the companies, click Generate report and send the generated summary.</p>
 <label>Your name</label><br><input id="reviewer" type="text" placeholder="Your name">
 </div>
 <div class="box grid"><input id="search" type="text" placeholder="Search company or sector"><select id="sector"><option value="all">All sectors</option></select></div>
 <div id="list" class="box">Loading companies...</div>
 <div class="bar"><button class="secondary" id="clear">Clear</button><button id="generate">Generate report</button></div>
-<div id="result" class="box hidden"><h2>Report</h2><p class="sub">Review the numbered shortlist below, then copy and send the summary to Ahmed.</p><div id="reportHtml" class="html-report"></div><textarea id="report" readonly></textarea><p><button id="copy">Copy report</button> <a id="email" class="btn secondary" href="#">Open email draft</a></p></div>
+<div id="result" class="box hidden"><h2>Report</h2><p class="sub">Copy and send the generated summary.</p><div id="reportHtml" class="html-report"></div><textarea id="report" readonly></textarea><p><button id="copy">Copy report</button> <a id="email" class="btn secondary" href="#">Open email draft</a></p></div>
 </div>
 <script>
 let companies=[],selected=new Set(),term='',activeSector='all';
