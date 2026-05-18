@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecoryx Connection Shortlist</title>
+<style>
+body{font-family:Arial,sans-serif;background:#faf6ee;color:#1a2622;margin:0}.wrap{max-width:950px;margin:auto;padding:24px}.box{background:white;border:1px solid #d6cfb9;border-radius:14px;padding:20px;margin-bottom:16px}h1{margin:0 0 8px;color:#2d6a4f}.sub{color:#7a7560}input,select,textarea{font:inherit;padding:10px;border:1px solid #d6cfb9;border-radius:8px;background:#faf6ee}input[type=text],select{width:100%;box-sizing:border-box}.grid{display:grid;grid-template-columns:1fr 240px;gap:10px}.sector{font-weight:bold;color:#2d6a4f;margin:18px 0 8px}.row{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:center;background:white;border:1px solid #d6cfb9;border-radius:10px;padding:10px;margin:6px 0}.row.on{background:#d8e8df;border-color:#2d6a4f}.name{font-weight:bold}.meta{font-size:12px;color:#7a7560}.bar{position:sticky;bottom:0;background:#faf6ee;border-top:1px solid #d6cfb9;padding:12px 0;display:flex;gap:8px;justify-content:flex-end}button,a.btn{border:0;border-radius:8px;background:#2d6a4f;color:white;padding:10px 14px;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-block}.secondary{background:white!important;color:#2d6a4f!important;border:1px solid #d6cfb9!important}textarea{width:100%;height:260px;box-sizing:border-box;white-space:pre}.hidden{display:none}@media(max-width:700px){.grid{grid-template-columns:1fr}.bar{flex-wrap:wrap}.row{grid-template-columns:28px 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="box">
+<h1>Ecoryx Connection Shortlist</h1>
+<p class="sub">Enter your name, tick only the companies where you know someone or can help reach someone, then generate the report.</p>
+<label>Your name</label><br><input id="reviewer" type="text" placeholder="Your name">
+</div>
+<div class="box grid"><input id="search" type="text" placeholder="Search company or sector"><select id="sector"><option value="all">All sectors</option></select></div>
+<div id="list" class="box">Loading companies...</div>
+<div class="bar"><button class="secondary" id="clear">Clear</button><button id="generate">Generate report</button></div>
+<div id="result" class="box hidden"><h2>Report</h2><p class="sub">Copy and send this report to Ahmed.</p><textarea id="report" readonly></textarea><p><button id="copy">Copy report</button> <a id="email" class="btn secondary" href="#">Open email draft</a></p></div>
+</div>
+<script>
+let companies=[],selected=new Set(),term='',activeSector='all';
+const $=id=>document.getElementById(id);
+$('search').oninput=e=>{term=e.target.value.toLowerCase().trim();render()};
+$('sector').onchange=e=>{activeSector=e.target.value;render()};
+$('clear').onclick=()=>{selected.clear();render()};
+$('generate').onclick=makeReport;
+$('copy').onclick=async()=>{await navigator.clipboard.writeText($('report').value);alert('Report copied')};
+async function load(){
+ try{const html=await fetch('index.html',{cache:'no-store'}).then(r=>r.text());const m=html.match(/const EMBEDDED_COMPANIES\s*=\s*(\[[\s\S]*?\]);\s*const SECTORS/);companies=JSON.parse(m[1]);}
+ catch(e){companies=[{id:1,en:'Diriyah Company',sec:'Real Estate & Development'},{id:2,en:'ROSHN',sec:'Real Estate & Development'},{id:3,en:'Red Sea Global',sec:'Real Estate & Development'},{id:4,en:'Qiddiya',sec:'Real Estate & Development'},{id:5,en:"Maaden",sec:'Mining'},{id:6,en:'SABIC',sec:'Petrochemicals'},{id:7,en:'Almarai',sec:'Food'}];}
+ companies.sort((a,b)=>(a.sec||'').localeCompare(b.sec||'')||(a.en||'').localeCompare(b.en||''));
+ const sectors=[...new Set(companies.map(c=>c.sec||'Other'))].sort();
+ $('sector').innerHTML='<option value="all">All sectors</option>'+sectors.map(s=>'<option>'+esc(s)+'</option>').join('');render();
+}
+function render(){let list=companies.filter(c=>{let h=((c.en||'')+' '+(c.ar||'')+' '+(c.sec||'')).toLowerCase();return(activeSector==='all'||c.sec===activeSector)&&(!term||h.includes(term))});let html='',cur='';if(!list.length)html='No matching companies.';list.forEach(c=>{if(c.sec!==cur){cur=c.sec;html+='<div class="sector">'+esc(cur||'Other')+'</div>'}let id=String(c.id),on=selected.has(id);html+='<label class="row '+(on?'on':'')+'"><input type="checkbox" data-id="'+esc(id)+'" '+(on?'checked':'')+'><div><div class="name">'+esc(c.en||'')+'</div><div class="meta">'+esc(c.ar||'')+'</div></div></label>'});$('list').innerHTML=html;$('list').querySelectorAll('input').forEach(cb=>cb.onchange=e=>{e.target.checked?selected.add(e.target.dataset.id):selected.delete(e.target.dataset.id);render()})}
+function makeReport(){let name=$('reviewer').value.trim();if(!name){alert('Please enter your name');return}let picked=companies.filter(c=>selected.has(String(c.id)));if(!picked.length){alert('Please select at least one company');return}let grouped={};picked.forEach(c=>{let s=c.sec||'Other';(grouped[s]=grouped[s]||[]).push(c.en)});let out='Ecoryx BD Connection Shortlist\nReviewer: '+name+'\nDate: '+new Date().toLocaleString()+'\nSelected companies: '+picked.length+'\n\n';Object.keys(grouped).sort().forEach(s=>{out+=s+'\n';grouped[s].forEach(x=>out+='- '+x+'\n');out+='\n'});$('report').value=out.trim();$('result').classList.remove('hidden');$('email').href='mailto:?subject='+encodeURIComponent('Ecoryx BD Connection Shortlist - '+name)+'&body='+encodeURIComponent(out);$('result').scrollIntoView({behavior:'smooth'});}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+load();
+</script>
+</body>
+</html>
